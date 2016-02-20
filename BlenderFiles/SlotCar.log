@@ -7,15 +7,15 @@
 		texture directory:  C:\dev\SlotCarRacing\BlenderFiles\
 	Python World class constructor completed
 	processing begun of mesh:  Curve1
-		WARNING: No materials have been assigned: 
+		processing begun of Standard material:  Track Material
 		num positions      :  36
 		num normals        :  36
 		num uvs            :  0
 		num uvs2           :  0
 		num colors         :  0
-		num indices        :  108
+		num indices        :  204
 	processing begun of mesh:  Track2
-		WARNING: No materials have been assigned: 
+		registered as also a user of material:  Track Material
 		num positions      :  8
 		num normals        :  8
 		num uvs            :  0
@@ -23,7 +23,7 @@
 		num colors         :  0
 		num indices        :  36
 	processing begun of mesh:  Track1
-		WARNING: No materials have been assigned: 
+		registered as also a user of material:  Track Material
 		num positions      :  8
 		num normals        :  8
 		num uvs            :  0
@@ -31,7 +31,7 @@
 		num colors         :  0
 		num indices        :  36
 	processing begun of mesh:  Car2
-		WARNING: No materials have been assigned: 
+		processing begun of Standard material:  BlueCar
 		num positions      :  8
 		num normals        :  8
 		num uvs            :  0
@@ -39,7 +39,7 @@
 		num colors         :  0
 		num indices        :  36
 	processing begun of mesh:  Car1
-		WARNING: No materials have been assigned: 
+		processing begun of Standard material:  RedCar
 		num positions      :  8
 		num normals        :  8
 		num uvs            :  0
@@ -55,8 +55,11 @@
 		num colors         :  0
 		num indices        :  36
 	processing begun of camera (FreeCamera):  Camera
+	processing begun of light (POINT):  Lamp.003
+	processing begun of light (POINT):  Lamp.002
+	processing begun of light (POINT):  Lamp.001
 	processing begun of light (POINT):  Lamp
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.021 secs
+elapsed time:  0 min, 0.019 secs
