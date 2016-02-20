@@ -6,6 +6,14 @@
 		inline textures:  false
 		texture directory:  C:\dev\SlotCarRacing\BlenderFiles\
 	Python World class constructor completed
+	processing begun of mesh:  Cube
+		processing begun of Standard material:  Wall
+		num positions      :  8
+		num normals        :  8
+		num uvs            :  0
+		num uvs2           :  0
+		num colors         :  0
+		num indices        :  36
 	processing begun of mesh:  Curve1
 		processing begun of Standard material:  Track Material
 		num positions      :  36
@@ -64,4 +72,4 @@
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.0255 secs
+elapsed time:  0 min, 0.0167 secs
