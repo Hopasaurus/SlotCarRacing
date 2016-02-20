@@ -23,6 +23,8 @@
 		num colors         :  0
 		num indices        :  36
 	processing begun of mesh:  Track1
+		animation processing begun
+			processing action Track1Action
 		registered as also a user of material:  Track Material
 		num positions      :  8
 		num normals        :  8
@@ -62,4 +64,4 @@
 ========= Writing of scene file started =========
 ========= Writing of scene file completed =========
 ========= end of processing =========
-elapsed time:  0 min, 0.019 secs
+elapsed time:  0 min, 0.0255 secs
