@@ -9,6 +9,10 @@ var CURVE_DOWN_RIGHT = 3;
 var STRAIGHT_LEFT_RIGHT = 1;
 var STRAIGHT_UP_DOWN = 0;
 var CAR_RIDE_HEIGHT = 0.012;
+var CAR_PIN_OFFSET = 0.14;
+
+var degToRad = function(deg) { return deg*(Math.PI/180); }
+var radToDeg = function(rad) { return rad*(180/Math.PI); }
 
 var buildStraight = function(rotation) {
 	return {
@@ -41,8 +45,8 @@ var placeTrack = function(scene, origin, trackSpec, x, z) {
         var straightTrack = _.find(scene.meshes, function(mesh) { return mesh.name === "Track1"; });
 		var track = straightTrack.clone(straightTrack.name);
 		track.rotation.y = trackSpec.rotation;
-		track.position.x = origin.x + x * 1.5 + 0.75;
-		track.position.z = origin.z + z * 1.5 + 0.75;
+		track.position.x = origin.x + x * TRACK_TILE_SIZE + STRAIGHT_TILE_OFFSET;
+		track.position.z = origin.z + z * TRACK_TILE_SIZE + STRAIGHT_TILE_OFFSET;
 		track.position.y = origin.y;
 	}
 
@@ -51,12 +55,12 @@ var placeTrack = function(scene, origin, trackSpec, x, z) {
 		var track = curveTrack.clone(curveTrack.name);
         var yoffset = 0;
         var xoffset = 0;
-		if(trackSpec.orientation === 0) { xoffset = 1.5; yoffset = 0; }
-		if(trackSpec.orientation === 2) { xoffset = 0; yoffset = 1.5; }
-		if(trackSpec.orientation === 3) { xoffset = 1.5; yoffset = 1.5; }
+		if(trackSpec.orientation === 0) { xoffset = TRACK_TILE_SIZE; yoffset = 0; }
+		if(trackSpec.orientation === 2) { xoffset = 0; yoffset = TRACK_TILE_SIZE; }
+		if(trackSpec.orientation === 3) { xoffset = TRACK_TILE_SIZE; yoffset = TRACK_TILE_SIZE; }
 		track.rotation.y = trackSpec.rotation;
-		track.position.x = origin.x + x * 1.5 + xoffset;
-		track.position.z = origin.z + z * 1.5 + yoffset;
+		track.position.x = origin.x + x * TRACK_TILE_SIZE + xoffset;
+		track.position.z = origin.z + z * TRACK_TILE_SIZE + yoffset;
 		track.position.y = origin.y ;
 	}
 }
@@ -69,7 +73,7 @@ var buildTrack = function(scene, trackLayout, origin) {
 	});
 }
 
-var initCar = function(scene, track, lane, car) {
+var initCar = function(track, lane, car) {
     var newCar = car.clone(car.name);
 
     var laneOffset = -0.1;
@@ -83,9 +87,143 @@ var initCar = function(scene, track, lane, car) {
     newCar.position.z = track.Origin.z + track.Start.z * TRACK_TILE_SIZE + STRAIGHT_TILE_OFFSET;
     newCar.position.y = track.Origin.y + CAR_RIDE_HEIGHT;
 
-    track.Cars[lane] = { mesh: newCar, lane: lane, speed: 0, velocity: {x: 0, z: 0, y: 0}, throttle: 0, heading: heading, position: {x: track.Start.x, z: track.Start.z}};
+    var velocity = {x: 0, y: 0, z: 0};
+    track.Cars[lane] = { mesh: newCar, lane: lane, velocity: velocity, throttle: 0, heading: heading };
+    console.log(track.Cars[lane]);
 }
 
+var rectToPolar = function(rect) {
+    return {
+        r: Math.sqrt(Math.pow(rect.x, 2) + Math.pow(rect.y, 2)),
+        a: Math.atan2(rect.x, rect.y)
+    };
+};
+
+var polarToRect = function(polar) {
+    return {
+        x: polar.r * Math.cos(polar.a),
+        y: polar.r * Math.sin(polar.a)
+    };
+};
+
+var flipRadialHeading = function(heading) {
+    if(heading < Math.PI) { 
+        return heading + Math.PI; 
+    }
+
+    return heading - Math.PI;
+};
+
+var updateVelocity = function(car) {
+    //TODO:  work out spinning and flipping....
+
+    var DRAG_FACTOR = 0.75;
+    var POWER_FACTOR = 1;
+    var FULL_THROTTLE = 100;
+    var THROTTLE_FACTOR = 5;
+    
+    //velocity is rectangular
+    var rectVelocity = { x: car.velocity.x, y: car.velocity.z};
+    var polarVelocity = rectToPolar({ x: car.velocity.x, y: car.velocity.z});
+    var polarDrag = { a: flipRadialHeading(polarVelocity.a), r: (polarVelocity.r * DRAG_FACTOR) };
+    var rectDrag = polarToRect(polarDrag);
+    var polarThrust = { a: car.heading, r: (POWER_FACTOR * (car.throttle / FULL_THROTTLE) * THROTTLE_FACTOR) };
+    var rectThrust = polarToRect(polarThrust);
+
+    var newVelocity = {
+        x: rectVelocity.x + rectDrag.x + rectThrust.x,
+        y: rectVelocity.y + rectDrag.y + rectThrust.y
+    };
+
+    return {
+        x: newVelocity.x,
+        z: newVelocity.y,
+        y: car.velocity.y
+    }
+};
+
+var getPinLocation = function(car) {
+
+    var pinOffset = polarToRect({ r: CAR_PIN_OFFSET, a: car.heading });
+    console.log(car.heading);
+    console.log(pinOffset);
+
+    return { 
+        x: car.mesh.position.x + pinOffset.x, 
+        z: car.mesh.position.z + pinOffset.y 
+    };
+};
+
+var getCurrentTile = function(track, pinLocation) {
+    console.log(pinLocation);
+    return {
+        x: Math.floor((pinLocation.x - track.Origin.x) / TRACK_TILE_SIZE),  
+        z: Math.floor((pinLocation.z - track.Origin.z) / TRACK_TILE_SIZE)    
+    };
+};
+
+var getCenterOfTile = function(track, tile) {
+    return {
+        x: track.Origin.x + tile.x * TRACK_TILE_SIZE + STRAIGHT_TILE_OFFSET,
+        z: track.Origin.z + tile.z * TRACK_TILE_SIZE + STRAIGHT_TILE_OFFSET
+    };
+};
+        
+var getCorrectAngle = function(tile, track, car) {
+    //get reference point for tile
+    //  for straight, is ??? from center of tile
+    //  need to know orientation of tile
+    //  for round is ??? from corner of tile
+    //  need to know orientation of tile...
+    //  also need to figure out if it is near or far lane from center of tile.
+    
+
+    //TODO: bounds check the tile...
+    var tileSpec = track.Layout[tile.x][tile.z];
+    if(tileSpec.type==="straight") {
+        //measure from  middle of tile offset by LANE_OFFSET (0.1)
+        // take the closest of a positive or negative offset.
+        var tileCenter = getCenterOfTile(track, tile); 
+        var carPosition = car.mesh.position;
+        if(tileSpec.orientation === STRAIGHT_UP_DOWN) {
+            var diff = car.mesh.position.z - tileCenter.z;
+            var a = Math.sqrt(Math.pow(CAR_PIN_OFFSET, 2) - Math.pow(diff, 2));
+            var blah = rectToPolar({ x: diff, y: a});
+            return blah.a;
+        } else {
+            var diff = car.mesh.position.x - tileCenter.x;
+            var a = Math.sqrt(Math.pow(CAR_PIN_OFFSET, 2) - Math.pow(diff, 2));
+            var blah = rectToPolar({ x: a, y: diff });
+            console.log(blah);
+            return blah.a;
+        }
+    }
+    if(tileSpec.type==="curve") {
+    }
+
+    return 0;
+}
+
+var updateCar = function(track, lane) {
+    var car = track.Cars[lane];
+
+    car.velocity = updateVelocity(car);
+
+    //push the car forward at its current velocity
+    car.mesh.position.x += car.velocity.x;
+    car.mesh.position.z += car.velocity.z;
+    
+    
+    var pinLocation = getPinLocation(car);
+    //figure out what tile we are on
+    var tile = getCurrentTile(track, pinLocation);
+    var newHeading = getCorrectAngle(tile, track, car);
+
+    //if angle needed to rotate back is greater than "critical" angle, send car flying
+    //
+    //rotate car to get pin back to track
+    car.heading = newHeading;
+};
 
 if (BABYLON.Engine.isSupported()) {
     var canvas = document.getElementById("renderCanvas");
@@ -93,35 +231,25 @@ if (BABYLON.Engine.isSupported()) {
 
     BABYLON.SceneLoader.Load("", "BlenderFiles/SlotCar.babylon", engine, function (newScene) {
 	
-//console.log(newScene);
         var car1 = _.find(newScene.meshes, function(mesh) { return mesh.name === "Car1"; });
         var car2 = _.find(newScene.meshes, function(mesh) { return mesh.name === "Car2"; });
 
-
-
         buildTrack(newScene, track.Layout, track.Origin);
-        initCar(newScene, track, 1, car1); 
-        initCar(newScene, track, 2, car2); 
+        initCar(track, 2, car2); 
+        initCar(track, 1, car1); 
 
-//var newCar = car1.clone(car1.name);
-//newCar.position.x += 2;
-//newScene.meshes.push(newCar);
-
+        track.Cars[1].throttle = .005;
+        updateCar(track, 2);
+        //TODO: hide the "spare parts"
+        
         newScene.executeWhenReady(function () {
 		
             newScene.activeCamera.attachControl(canvas);
 
             engine.runRenderLoop(function() {
-		//fiddle with cars here...
-		//newScene.meshes[0].position.x += .001;
-//		if(newScene.meshes[2].position.x < 1) {
-//			newScene.meshes[2].position.x += .005;
-			//newScene.meshes[2].position.y += .005;
-//		}
-//car1.rotation.y += .1;
-//		newScene.meshes[2].rotation.y += .005;
-
-                //track.Cars[1].rotation.y += .1;
+                //fiddle with cars here...
+                updateCar(track, 1);
+                //check for input maybe too...
 
                 newScene.render();
             });
