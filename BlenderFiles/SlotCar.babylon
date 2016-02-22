@@ -50,7 +50,7 @@
 ,"subMeshes":[{"materialIndex":0,"verticesStart":0,"verticesCount":8,"indexStart":0,"indexCount":36}]
 ,"instances":[]}
 ],
-"cameras":[{"name":"Camera","id":"Camera","position":[3.0488,2.2128,-3.9352],"rotation":[0.451,-0.7312,0.0143],"fov":0.8576,"minZ":0.1,"maxZ":100,"speed":1,"inertia":0.9,"checkCollisions":false,"applyGravity":false,"ellipsoid":[0.2,0.9,0.2],"cameraRigMode":0,"interaxial_distance":0.0637,"type":"FreeCamera"}],"activeCamera":"Camera",
+"cameras":[{"name":"Camera","id":"Camera","position":[3.0488,2.2128,-3.9352],"rotation":[0.7145,-0.7312,0.0143],"fov":0.8576,"minZ":0.1,"maxZ":100,"speed":1,"inertia":0.9,"checkCollisions":false,"applyGravity":false,"ellipsoid":[0.2,0.9,0.2],"cameraRigMode":0,"interaxial_distance":0.0637,"type":"FreeCamera"}],"activeCamera":"Camera",
 "lights":[{"name":"Lamp.003","id":"Lamp.003","type":0,"position":[4.4781,5.9039,4.4548],"intensity":1,"diffuse":[1,1,1],"specular":[1,1,1]},{"name":"Lamp.002","id":"Lamp.002","type":0,"position":[-4.3887,5.1461,4.2614],"intensity":1,"diffuse":[1,1,1],"specular":[1,1,1]},{"name":"Lamp.001","id":"Lamp.001","type":0,"position":[-4.5435,5.9039,-4.5202],"intensity":1,"diffuse":[1,1,1],"specular":[1,1,1]},{"name":"Lamp","id":"Lamp","type":0,"position":[4.0762,5.9039,-4.4532],"intensity":1,"diffuse":[1,1,1],"specular":[1,1,1]}],
 "shadowGenerators":[]
 }
